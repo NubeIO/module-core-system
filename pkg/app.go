@@ -1,6 +1,6 @@
 package pkg
 
-import "github.com/NubeIO/flow-framework/api"
+import "github.com/NubeIO/rubix-os/api"
 
 var argType = api.ArgsType
 var name = "system"

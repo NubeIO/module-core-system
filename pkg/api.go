@@ -3,8 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/NubeIO/flow-framework/module/common"
 	"github.com/NubeIO/lib-schema/systemschema"
+	"github.com/NubeIO/rubix-os/module/common"
 )
 
 const (

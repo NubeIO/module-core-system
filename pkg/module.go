@@ -1,9 +1,9 @@
 package pkg
 
 import (
-	"github.com/NubeIO/flow-framework/module/shared"
-	"github.com/NubeIO/flow-framework/utils/nstring"
-	"github.com/NubeIO/system-module/marshal"
+	"github.com/NubeIO/module-core-system/marshal"
+	"github.com/NubeIO/rubix-os/module/shared"
+	"github.com/NubeIO/rubix-os/utils/nstring"
 )
 
 type Module struct {
