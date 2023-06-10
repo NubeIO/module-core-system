@@ -4,10 +4,13 @@ go 1.20
 
 require (
 	github.com/NubeIO/lib-schema v0.2.15
+	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.6.0
 	github.com/NubeIO/rubix-os v0.0.1-rc3
+	github.com/go-co-op/gocron v1.7.0
 	github.com/hashicorp/go-hclog v1.5.0
 	github.com/hashicorp/go-plugin v1.4.10
+	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
@@ -22,14 +25,12 @@ require (
 	github.com/NubeIO/lib-systemctl-go v0.3.1 // indirect
 	github.com/NubeIO/lib-ufw v0.0.3 // indirect
 	github.com/NubeIO/nubeio-rubix-lib-auth-go v1.2.0 // indirect
-	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7 // indirect
 	github.com/NubeIO/rubix-registry-go v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/eclipse/paho.mqtt.golang v1.3.5 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.4 // indirect
-	github.com/go-co-op/gocron v1.7.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -54,12 +55,12 @@ require (
 	github.com/mustafaturan/bus/v3 v3.0.3 // indirect
 	github.com/mustafaturan/monoton/v2 v2.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rvflash/elapsed v0.3.0 // indirect
 	github.com/sergeymakinen/go-systemdconf/v2 v2.0.2 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.8.0 // indirect
