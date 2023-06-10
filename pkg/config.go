@@ -1,12 +1,23 @@
 package pkg
 
-// Config is user plugin configuration
 type Config struct {
+	Schedule Schedule `yaml:"schedule"`
+	LogLevel string   `yaml:"log_level"`
 }
 
-// DefaultConfig implements plugin.Configurer
+type Schedule struct {
+	Frequency string `yaml:"frequency"`
+}
+
 func (m *Module) DefaultConfig() interface{} {
-	return &Config{}
+	schedule := Schedule{
+		Frequency: "60s",
+	}
+
+	return &Config{
+		Schedule: schedule,
+		LogLevel: "ERROR",
+	}
 }
 
 func (m *Module) GetConfig() interface{} {

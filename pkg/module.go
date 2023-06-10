@@ -1,29 +1,27 @@
 package pkg
 
 import (
-	"github.com/NubeIO/module-core-system/marshal"
 	"github.com/NubeIO/rubix-os/module/shared"
+	"github.com/NubeIO/rubix-os/src/cachestore"
 	"github.com/NubeIO/rubix-os/utils/nstring"
 )
 
 type Module struct {
 	dbHelper       shared.DBHelper
 	moduleName     string
-	grpcMarshaller marshal.Marshaller
+	grpcMarshaller shared.Marshaller
 	config         *Config
 	pluginUUID     string
 	networkUUID    string
 	interruptChan  chan struct{}
+	store          cachestore.Handler
 }
 
-var module *Module
-
 func (m *Module) Init(dbHelper shared.DBHelper, moduleName string) error {
-	grpcMarshaller := marshal.GrpcMarshaller{DbHelper: dbHelper}
+	grpcMarshaller := shared.GRPCMarshaller{DbHelper: dbHelper}
 	m.dbHelper = dbHelper
 	m.moduleName = moduleName
 	m.grpcMarshaller = &grpcMarshaller
-	module = m
 	return nil
 }
 
