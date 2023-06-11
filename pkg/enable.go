@@ -11,7 +11,7 @@ var cron *gocron.Scheduler
 
 func (m *Module) Enable() error {
 	log.Info("plugin is enabling...")
-	networks, err := m.grpcMarshaller.GetNetworksByPluginName(pluginName, "") // TODO: Check this
+	networks, err := m.grpcMarshaller.GetNetworksByPluginName(pluginName, "")
 
 	if err != nil {
 		log.Error(err)
