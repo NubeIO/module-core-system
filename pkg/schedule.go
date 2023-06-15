@@ -96,8 +96,8 @@ func (m *Module) runSchedule() {
 		log.Info(fmt.Sprintf("Schedule Checks: finalResult: %+v", finalResult))
 
 		if sch != nil {
-			m.store.Set(sch.Name, finalResult, -1)           // TODO: Check this
-			sch.IsActive = boolean.New(finalResult.IsActive) // TODO: Check this
+			m.store.Set(sch.Name, finalResult, -1)
+			sch.IsActive = boolean.New(finalResult.IsActive)
 			sch.ActiveWeekly = boolean.New(weeklyResult.IsActive)
 			sch.ActiveException = boolean.New(exceptionResult.IsActive)
 			sch.ActiveEvent = boolean.New(eventResult.IsActive)
