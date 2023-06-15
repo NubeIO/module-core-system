@@ -2,8 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/NubeIO/module-core-system/utils"
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/times/utilstime"
-	"github.com/NubeIO/rubix-os/src/schedule"
 	"github.com/NubeIO/rubix-os/utils/boolean"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -11,7 +11,7 @@ import (
 )
 
 func (m *Module) runSchedule() {
-	schedules, err := m.grpcMarshaller.GetSchedules() // TODO: Check this
+	schedules, err := m.grpcMarshaller.GetSchedules()
 	if err != nil {
 		log.Error(fmt.Sprintf("Schedule Checks: GetSchedules %s", err.Error()))
 		return
@@ -20,7 +20,7 @@ func (m *Module) runSchedule() {
 	}
 
 	for _, sch := range schedules {
-		scheduleJSON, err := schedule.DecodeSchedule(sch.Schedule) // TODO: Check this
+		scheduleJSON, err := utils.DecodeSchedule(sch.Schedule)
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: issue on DecodeSchedule %v\n", err))
 			return
@@ -40,7 +40,7 @@ func (m *Module) runSchedule() {
 		_, err = time.LoadLocation(timezone)
 		if timezone == "" || err != nil {
 			log.Error("Schedule Checks: CheckWeeklyScheduleCollection(): no timezone pass in from user")
-			systemTimezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0] // TODO: Check this
+			systemTimezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0]
 			if systemTimezone == "" {
 				zone, _ := utilstime.GetHardwareTZ()
 				timezone = zone
@@ -51,7 +51,7 @@ func (m *Module) runSchedule() {
 		}
 
 		// CHECK WEEKLY SCHEDULES
-		weeklyResult, err := schedule.WeeklyCheck(scheduleJSON.Schedules.Weekly, scheduleNameToCheck, timezone) // TODO: Check this
+		weeklyResult, err := utils.WeeklyCheck(scheduleJSON.Schedules.Weekly, scheduleNameToCheck, timezone)
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: issue on WeeklyCheck %v\n", err))
 		} else {
@@ -59,7 +59,7 @@ func (m *Module) runSchedule() {
 		}
 
 		// CHECK EVENT SCHEDULES
-		eventResult, err := schedule.EventCheck(scheduleJSON.Schedules.Events, scheduleNameToCheck, timezone) // TODO: Check this
+		eventResult, err := utils.EventCheck(scheduleJSON.Schedules.Events, scheduleNameToCheck, timezone)
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: issue on eventResult %s", err.Error()))
 		} else {
@@ -68,7 +68,7 @@ func (m *Module) runSchedule() {
 		log.Info(fmt.Sprintf("Schedule Checks: eventResult: %+v", eventResult))
 
 		// 	COMBINE EVENT AND WEEKLY SCHEDULE RESULTS
-		weeklyAndEventResult, err := schedule.CombineScheduleCheckerResults(weeklyResult, eventResult, timezone) // TODO: Check this
+		weeklyAndEventResult, err := utils.CombineScheduleCheckerResults(weeklyResult, eventResult, timezone)
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: issue on weeklyAndEventResult %s", err.Error()))
 		} else {
@@ -77,8 +77,7 @@ func (m *Module) runSchedule() {
 		log.Info(fmt.Sprintf("Schedule Checks: weeklyAndEventResult: %+v", weeklyAndEventResult))
 
 		// CHECK EXCEPTION SCHEDULES
-		// TODO: Check this
-		exceptionResult, err := schedule.ExceptionCheck(scheduleJSON.Schedules.Exceptions, scheduleNameToCheck, timezone) // This will check for any active schedules with defined name.
+		exceptionResult, err := utils.ExceptionCheck(scheduleJSON.Schedules.Exceptions, scheduleNameToCheck, timezone) // This will check for any active schedules with defined name.
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: issue on exceptionResult %s", err.Error()))
 		} else {
@@ -89,8 +88,7 @@ func (m *Module) runSchedule() {
 		}
 		log.Info(fmt.Sprintf("Schedule Checks: exceptionResult: %+v", exceptionResult))
 
-		// TODO: Check this
-		finalResult, err := schedule.ApplyExceptionSchedule(weeklyAndEventResult, exceptionResult, timezone) // This applies the exception schedule to mask the combined weekly and event schedules.
+		finalResult, err := utils.ApplyExceptionSchedule(weeklyAndEventResult, exceptionResult, timezone) // This applies the exception schedule to mask the combined weekly and event schedules.
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: final-result: %s", err.Error()))
 		}

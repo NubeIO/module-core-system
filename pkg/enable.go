@@ -19,10 +19,11 @@ func (m *Module) Enable() error {
 
 	if len(networks) == 0 {
 		log.Warn("we don't have networks")
+		m.networkUUID = "NA"
+	} else {
+		network := networks[0]
+		m.networkUUID = network.UUID
 	}
-
-	network := networks[0]
-	m.networkUUID = network.UUID
 
 	cron = gocron.NewScheduler(time.UTC)
 	var frequency = "60s"

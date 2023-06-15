@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/NubeIO/rubix-os/module/shared"
 	"github.com/NubeIO/rubix-os/src/cachestore"
-	"github.com/NubeIO/rubix-os/utils/nstring"
 )
 
 type Module struct {
@@ -33,8 +32,4 @@ func (m *Module) GetInfo() (*shared.Info, error) {
 		License:    "N/A",
 		HasNetwork: true,
 	}, nil
-}
-
-func (m *Module) GetUrlPrefix() (*string, error) {
-	return nstring.New(urlPrefix), nil
 }

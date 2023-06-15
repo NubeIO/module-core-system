@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/bugs"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
-	"github.com/NubeIO/rubix-os/api"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
 
-var argType = api.ArgsType
-var name = "system"
-var urlPrefix = "system"
+var name = "module-core-system"
 
 func (m *Module) networkUpdateSuccess(uuid string) error {
 	var network model.Network

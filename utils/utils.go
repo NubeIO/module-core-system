@@ -1,0 +1,237 @@
+package utils
+
+import (
+	"encoding/json"
+	"errors"
+	"gorm.io/datatypes"
+	"time"
+)
+
+type DaysOfTheWeek int
+
+type EventStartStopTimestamps struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
+type WeeklyScheduleEntry struct {
+	Name     string   `json:"name"`
+	Days     []string `json:"days"`
+	DaysNums []DaysOfTheWeek
+	Start    string  `json:"start"`
+	End      string  `json:"end"`
+	Value    float64 `json:"value"`
+	Colour   string  `json:"color"`
+	Enable   *bool   `json:"enable"`
+}
+
+type EventScheduleEntry struct {
+	Name   string                     `json:"name"`
+	Dates  []EventStartStopTimestamps `json:"dates"`
+	Value  float64                    `json:"value"`
+	Colour string                     `json:"color"`
+	Enable *bool                      `json:"enable"`
+}
+
+type TypeWeekly map[string]WeeklyScheduleEntry
+
+type TypeEvents map[string]EventScheduleEntry
+
+type SchConfig struct {
+	ScheduleName datatypes.JSON `json:"names"`
+	TimeZone     string         `json:"timezone"`
+}
+
+type SchTypes struct {
+	Weekly     TypeWeekly `json:"weekly"`
+	Events     TypeEvents `json:"events"`
+	Exceptions TypeEvents `json:"exception"`
+	Config     SchConfig  `json:"config"`
+}
+
+type SchJSON struct {
+	Schedules SchTypes  `json:"schedules"`
+	Config    SchConfig `json:"config"`
+}
+
+const (
+	sunday    DaysOfTheWeek = iota // 0
+	monday                         // 1
+	tuesday                        // 2
+	wednesday                      // 3
+	thursday                       // 4
+	friday                         // 5
+	saturday                       // 6
+)
+
+var DaysMap = map[string]DaysOfTheWeek{
+	"sunday":    0,
+	"monday":    1,
+	"tuesday":   2,
+	"wednesday": 3,
+	"thursday":  4,
+	"friday":    5,
+	"saturday":  6,
+}
+
+type ScheduleCheckerResult struct {
+	Name              string   `json:"name"`
+	IsActive          bool     `json:"is_active"`
+	Payload           float64  `json:"payload"`
+	PeriodStart       int64    `json:"period_start"`        // unix timestamp in seconds
+	PeriodStartString string   `json:"period_start_string"` // human readable timestamp
+	PeriodStop        int64    `json:"period_stop"`         // unix timestamp in seconds
+	PeriodStopString  string   `json:"period_stop_string"`  // human readable timestamp
+	NextStart         int64    `json:"next_start"`          // unix timestamp in seconds.  Start time for the following scheduled period.
+	NextStartString   string   `json:"next_start_string"`   // human readable timestamp
+	NextStop          int64    `json:"next_stop"`           // unix timestamp in seconds.  End time for the following scheduled period.
+	NextStopString    string   `json:"next_stop_string"`    // human readable timestamp
+	CheckTime         int64    `json:"check_time"`          // unix timestamp in seconds
+	CheckTimeString   string   `json:"check_time_string"`   // human readable timestamp
+	ErrorFlag         bool     `json:"error_flag"`
+	AlertFlag         bool     `json:"alert_flag"`
+	IsException       bool     `json:"is_exception"`
+	ErrorStrings      []string `json:"error_strings"`
+}
+
+func ConvertToHumanDatetimeWithLocation(unixTime int64, location *time.Location) string {
+	result := time.Unix(unixTime, int64(0)).In(location).String()
+	return result
+}
+
+func AddHumanReadableDatetimes(existing *ScheduleCheckerResult, timezone string) {
+	location, _ := time.LoadLocation(timezone)
+	existing.ErrorStrings = make([]string, len(existing.ErrorStrings))
+	existing.PeriodStartString = ConvertToHumanDatetimeWithLocation(existing.PeriodStart, location)
+	existing.PeriodStopString = ConvertToHumanDatetimeWithLocation(existing.PeriodStop, location)
+	existing.NextStartString = ConvertToHumanDatetimeWithLocation(existing.NextStart, location)
+	existing.NextStopString = ConvertToHumanDatetimeWithLocation(existing.NextStop, location)
+	existing.CheckTimeString = ConvertToHumanDatetimeWithLocation(existing.CheckTime, location)
+}
+
+// CombineScheduleCheckerResults Combines 2 ScheduleCheckerResults into a single ScheduleCheckerResult,
+// calculating PeriodStart, and PeriodStop times of the combined ScheduleCheckerResult.
+func CombineScheduleCheckerResults(current ScheduleCheckerResult, new ScheduleCheckerResult, timezone string) (ScheduleCheckerResult, error) {
+	result := ScheduleCheckerResult{}
+	var err error
+
+	// Check for Exception Schedules
+	if current.IsException || new.IsException {
+		err = errors.New("CombineScheduleCheckerResults function is not valid for Exception Schedules")
+		return result, err
+	}
+
+	// Check for empty ScheduleCheckerResult periods
+	currentEmptyPeriod := false
+	newEmptyPeriod := false
+	if current.PeriodStart == 0 || current.PeriodStop == 0 {
+		currentEmptyPeriod = true
+	}
+	if new.PeriodStart == 0 || new.PeriodStop == 0 {
+		newEmptyPeriod = true
+	}
+	if currentEmptyPeriod && newEmptyPeriod {
+		return result, err
+	} else if currentEmptyPeriod { // return the valid (new) ScheduleCheckerResult
+		return new, err
+	} else if newEmptyPeriod { // return the valid (current) ScheduleCheckerResult
+		return current, err
+	}
+
+	// AlertFlag & ErrorFlag & ErrorStrings
+	if new.ErrorFlag {
+		err = errors.New("`new` ScheduleCheckerResult has an ErrorFlag, cannot combine")
+		return current, err
+	}
+	if current.ErrorFlag {
+		err = errors.New("`current` ScheduleCheckerResult has an ErrorFlag, cannot combine")
+		return new, err
+	}
+	result.AlertFlag = current.AlertFlag || new.AlertFlag
+	result.ErrorStrings = append(current.ErrorStrings, new.ErrorStrings...)
+
+	// Name
+	if current.Name != new.Name {
+		result.Name = "ANY"
+	} else {
+		result.Name = current.Name
+	}
+
+	// Find order of periods
+	currentPeriod := 0
+	newPeriod := 0
+	// Find which Period is first
+	if current.PeriodStart <= new.PeriodStart {
+		currentPeriod = 1
+		newPeriod = 2
+	} else {
+		newPeriod = 1
+		currentPeriod = 2
+	}
+
+	// Check if the periods overlap.
+	overlap := false
+	if currentPeriod == 1 && new.PeriodStart < current.PeriodStop {
+		overlap = true
+	} else if newPeriod == 1 && current.PeriodStart < new.PeriodStop {
+		overlap = true
+	}
+
+	// IsActive
+	result.IsActive = current.IsActive || new.IsActive
+
+	// CheckTime
+	if current.CheckTime < new.CheckTime {
+		result.CheckTime = current.CheckTime
+	} else {
+		result.CheckTime = new.CheckTime
+	}
+
+	// PeriodStart
+	if currentPeriod == 1 {
+		result.PeriodStart = current.PeriodStart
+	} else {
+		result.PeriodStart = new.PeriodStart
+	}
+
+	// PeriodStop
+	if overlap {
+		if current.PeriodStop >= new.PeriodStop {
+			result.PeriodStop = current.PeriodStop
+		} else {
+			result.PeriodStop = new.PeriodStop
+		}
+	} else { // No overlap so find which period is first
+		if currentPeriod == 1 {
+			result.PeriodStop = current.PeriodStop
+		} else {
+			result.PeriodStop = new.PeriodStop
+		}
+	}
+
+	// Payload
+	if currentPeriod == 1 {
+		result.Payload = current.Payload
+	} else {
+		result.Payload = new.Payload
+	}
+	if (current.IsActive && new.IsActive) && (current.Payload != 0 && new.Payload != 0) {
+		result.AlertFlag = true
+		result.ErrorStrings = append(result.ErrorStrings, "Multiple Payload Values For Active Schedule Period")
+	}
+	AddHumanReadableDatetimes(&result, timezone)
+	return result, nil
+}
+
+func DecodeSchedule(scheduleJsonInput datatypes.JSON) (SchJSON, error) {
+	var ScheduleJSON SchJSON
+	err := json.Unmarshal(scheduleJsonInput, &ScheduleJSON)
+	if err != nil {
+		return SchJSON{}, err
+	}
+	return ScheduleJSON, nil
+}
+
+func (schedule ScheduleCheckerResult) CheckIfEmpty() bool {
+	return schedule.PeriodStart == 0 && schedule.PeriodStop == 0 && schedule.NextStart == 0 && schedule.NextStop == 0
+}
