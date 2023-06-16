@@ -23,7 +23,7 @@ func (m *Module) DefaultConfig() interface{} {
 
 	return &Config{
 		Schedule: schedule,
-		LogLevel: log.DebugLevel,
+		LogLevel: log.ErrorLevel,
 	}
 }
 
@@ -37,7 +37,7 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 		return nil, err
 	}
 	if newConfig.LogLevel == log.Level(0) {
-		newConfig.LogLevel = log.DebugLevel
+		newConfig.LogLevel = log.ErrorLevel
 	}
 	newConfValid, err := yaml.Marshal(newConfig)
 	if err != nil {
