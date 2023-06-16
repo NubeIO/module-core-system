@@ -11,7 +11,6 @@ require (
 	github.com/NubeIO/rubix-os v0.0.1-rc3
 	github.com/go-co-op/gocron v1.7.0
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/hashicorp/go-hclog v1.5.0
 	github.com/hashicorp/go-plugin v1.4.10
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.9.3
@@ -22,6 +21,7 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect

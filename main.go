@@ -7,15 +7,16 @@ import (
 	"github.com/hashicorp/go-plugin"
 )
 
-func ServePlugin() {
+func ServePlugin(module *pkg.Module) {
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: shared.HandshakeConfig,
-		Plugins:         plugin.PluginSet{"module-core-system": &shared.NubeModule{Impl: &pkg.Module{}}},
+		Plugins:         plugin.PluginSet{"module-core-system": &shared.NubeModule{Impl: module}},
 		GRPCServer:      plugin.DefaultGRPCServer,
 	})
 }
 
 func main() {
-	logger.SetLogger("INFO")
-	ServePlugin()
+	module := &pkg.Module{}
+	logger.SetLogger(module.Config)
+	ServePlugin(module)
 }

@@ -1,10 +1,13 @@
 package logger
 
-import "github.com/hashicorp/go-hclog"
+import (
+	"github.com/NubeIO/module-core-system/pkg"
+	log "github.com/sirupsen/logrus"
+)
 
-func SetLogger(logLevel string) {
-	hclog.SetDefault(hclog.New(&hclog.LoggerOptions{
-		Name:  "module-core-system",
-		Level: hclog.LevelFromString(logLevel),
-	}))
+func SetLogger(config *pkg.Config) {
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+	log.SetLevel(config.LogLevel)
 }

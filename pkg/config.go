@@ -7,28 +7,27 @@ import (
 )
 
 type Config struct {
-	Schedule        Schedule      `yaml:"schedule"`
-	LogLevel        string        `yaml:"log_level"`
-	ReIterationTime time.Duration `yaml:"re_iteration_time"`
+	Schedule Schedule  `yaml:"schedule"`
+	LogLevel log.Level `yaml:"log_level"`
 }
 
 type Schedule struct {
-	Frequency string `yaml:"frequency"`
+	Frequency time.Duration `yaml:"frequency"`
 }
 
 func (m *Module) DefaultConfig() interface{} {
 	schedule := Schedule{
-		Frequency: "60s",
+		Frequency: time.Duration(60),
 	}
 
 	return &Config{
 		Schedule: schedule,
-		LogLevel: "ERROR",
+		LogLevel: log.DebugLevel,
 	}
 }
 
 func (m *Module) GetConfig() interface{} {
-	return m.config
+	return m.Config
 }
 
 func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
@@ -36,14 +35,14 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	if err := yaml.Unmarshal(config, newConfig); err != nil {
 		return nil, err
 	}
-	if newConfig.ReIterationTime == 0 {
-		newConfig.ReIterationTime = time.Duration(5) * time.Second
+	if newConfig.LogLevel == log.Level(0) {
+		newConfig.LogLevel = log.DebugLevel
 	}
 	newConfValid, err := yaml.Marshal(newConfig)
 	if err != nil {
 		return nil, err
 	}
-	m.config = newConfig
+	m.Config = newConfig
 	log.Info("config is set")
 	return newConfValid, nil
 }
