@@ -16,7 +16,7 @@ func (m *Module) runSchedule() {
 		log.Errorf("Schedule Checks: GetSchedules %s", err.Error())
 		return
 	} else {
-		log.Infof("Schedule Checks: run schedule checks, schedule count: %d", len(schedules))
+		log.Debugf("Schedule Checks: run schedule checks, schedule count: %d", len(schedules))
 	}
 
 	for _, sch := range schedules {
@@ -26,7 +26,7 @@ func (m *Module) runSchedule() {
 			return
 		}
 		if !boolean.IsTrue(sch.Enable) {
-			log.Infof("Schedule Checks: runSchedule sch is not enabled so skip logic. name: %s", sch.Name)
+			log.Debugf("Schedule Checks: runSchedule sch is not enabled so skip logic. name: %s", sch.Name)
 			return
 		}
 
@@ -55,7 +55,7 @@ func (m *Module) runSchedule() {
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on WeeklyCheck %v\n", err)
 		} else {
-			log.Infof("Schedule Checks: weekly schedule: %s is-active %t", weeklyResult.Name, weeklyResult.IsActive)
+			log.Debugf("Schedule Checks: weekly schedule: %s is-active %t", weeklyResult.Name, weeklyResult.IsActive)
 		}
 
 		// CHECK EVENT SCHEDULES
@@ -63,37 +63,37 @@ func (m *Module) runSchedule() {
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on eventResult %s", err.Error())
 		} else {
-			log.Infof("Schedule Checks: event schedule: %s is-active: %t", eventResult.Name, eventResult.IsActive)
+			log.Debugf("Schedule Checks: event schedule: %s is-active: %t", eventResult.Name, eventResult.IsActive)
 		}
-		log.Infof("Schedule Checks: eventResult: %+v", eventResult)
+		log.Debugf("Schedule Checks: eventResult: %+v", eventResult)
 
 		// 	COMBINE EVENT AND WEEKLY SCHEDULE RESULTS
 		weeklyAndEventResult, err := utils.CombineScheduleCheckerResults(weeklyResult, eventResult, timezone)
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on weeklyAndEventResult %s", err.Error())
 		} else {
-			log.Infof("Schedule Checks: weekly & event schedule: %s is-active: %t", weeklyAndEventResult.Name, weeklyAndEventResult.IsActive)
+			log.Debugf("Schedule Checks: weekly & event schedule: %s is-active: %t", weeklyAndEventResult.Name, weeklyAndEventResult.IsActive)
 		}
-		log.Infof("Schedule Checks: weeklyAndEventResult: %+v", weeklyAndEventResult)
+		log.Debugf("Schedule Checks: weeklyAndEventResult: %+v", weeklyAndEventResult)
 
 		// CHECK EXCEPTION SCHEDULES
 		exceptionResult, err := utils.ExceptionCheck(scheduleJSON.Schedules.Exceptions, scheduleNameToCheck, timezone) // This will check for any active schedules with defined name.
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on exceptionResult %s", err.Error())
 		} else {
-			log.Infof("Schedule Checks: exception schedule: %s  is-active: %t", exceptionResult.Name, exceptionResult.IsActive)
+			log.Debugf("Schedule Checks: exception schedule: %s  is-active: %t", exceptionResult.Name, exceptionResult.IsActive)
 		}
 		if exceptionResult.CheckIfEmpty() {
-			log.Infof("Schedule Checks: exception schedule is empty: %s", exceptionResult.Name)
+			log.Debugf("Schedule Checks: exception schedule is empty: %s", exceptionResult.Name)
 		}
-		log.Infof("Schedule Checks: exceptionResult: %+v", exceptionResult)
+		log.Debugf("Schedule Checks: exceptionResult: %+v", exceptionResult)
 
 		finalResult, err := utils.ApplyExceptionSchedule(weeklyAndEventResult, exceptionResult, timezone) // This applies the exception schedule to mask the combined weekly and event schedules.
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: final-result: %s", err.Error()))
 		}
-		log.Infof("Schedule Checks: final-result: %s  is-active: %t timezone: %s", finalResult.Name, finalResult.IsActive, timezone)
-		log.Infof("Schedule Checks: finalResult: %+v", finalResult)
+		log.Debugf("Schedule Checks: final-result: %s  is-active: %t timezone: %s", finalResult.Name, finalResult.IsActive, timezone)
+		log.Debugf("Schedule Checks: finalResult: %+v", finalResult)
 
 		if sch != nil {
 			m.store.Set(sch.Name, finalResult, -1)
