@@ -13,20 +13,20 @@ import (
 func (m *Module) runSchedule() {
 	schedules, err := m.grpcMarshaller.GetSchedules()
 	if err != nil {
-		log.Error(fmt.Sprintf("Schedule Checks: GetSchedules %s", err.Error()))
+		log.Errorf("Schedule Checks: GetSchedules %s", err.Error())
 		return
 	} else {
-		log.Info(fmt.Sprintf("Schedule Checks: run schedule checks, schedule count: %d", len(schedules)))
+		log.Infof("Schedule Checks: run schedule checks, schedule count: %d", len(schedules))
 	}
 
 	for _, sch := range schedules {
 		scheduleJSON, err := utils.DecodeSchedule(sch.Schedule)
 		if err != nil {
-			log.Error(fmt.Sprintf("Schedule Checks: issue on DecodeSchedule %v\n", err))
+			log.Errorf("Schedule Checks: issue on DecodeSchedule %v\n", err)
 			return
 		}
 		if !boolean.IsTrue(sch.Enable) {
-			log.Info("Schedule Checks: runSchedule() sch is not enabled so skip logic. name:", sch.Name)
+			log.Infof("Schedule Checks: runSchedule sch is not enabled so skip logic. name: %s", sch.Name)
 			return
 		}
 
@@ -39,7 +39,7 @@ func (m *Module) runSchedule() {
 
 		_, err = time.LoadLocation(timezone)
 		if timezone == "" || err != nil {
-			log.Error("Schedule Checks: CheckWeeklyScheduleCollection(): no timezone pass in from user")
+			log.Error("Schedule Checks: CheckWeeklyScheduleCollection: no timezone pass in from user")
 			systemTimezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0]
 			if systemTimezone == "" {
 				zone, _ := utilstime.GetHardwareTZ()
@@ -53,47 +53,47 @@ func (m *Module) runSchedule() {
 		// CHECK WEEKLY SCHEDULES
 		weeklyResult, err := utils.WeeklyCheck(scheduleJSON.Schedules.Weekly, scheduleNameToCheck, timezone)
 		if err != nil {
-			log.Error(fmt.Sprintf("Schedule Checks: issue on WeeklyCheck %v\n", err))
+			log.Errorf("Schedule Checks: issue on WeeklyCheck %v\n", err)
 		} else {
-			log.Info(fmt.Sprintf("Schedule Checks: weekly schedule: %s is-active %t", weeklyResult.Name, weeklyResult.IsActive))
+			log.Infof("Schedule Checks: weekly schedule: %s is-active %t", weeklyResult.Name, weeklyResult.IsActive)
 		}
 
 		// CHECK EVENT SCHEDULES
 		eventResult, err := utils.EventCheck(scheduleJSON.Schedules.Events, scheduleNameToCheck, timezone)
 		if err != nil {
-			log.Error(fmt.Sprintf("Schedule Checks: issue on eventResult %s", err.Error()))
+			log.Errorf("Schedule Checks: issue on eventResult %s", err.Error())
 		} else {
-			log.Info(fmt.Sprintf("Schedule Checks: event schedule: %s is-active: %t", eventResult.Name, eventResult.IsActive))
+			log.Infof("Schedule Checks: event schedule: %s is-active: %t", eventResult.Name, eventResult.IsActive)
 		}
-		log.Info(fmt.Sprintf("Schedule Checks: eventResult: %+v", eventResult))
+		log.Infof("Schedule Checks: eventResult: %+v", eventResult)
 
 		// 	COMBINE EVENT AND WEEKLY SCHEDULE RESULTS
 		weeklyAndEventResult, err := utils.CombineScheduleCheckerResults(weeklyResult, eventResult, timezone)
 		if err != nil {
-			log.Error(fmt.Sprintf("Schedule Checks: issue on weeklyAndEventResult %s", err.Error()))
+			log.Errorf("Schedule Checks: issue on weeklyAndEventResult %s", err.Error())
 		} else {
-			log.Info(fmt.Sprintf("Schedule Checks: weekly & event schedule: %s is-active: %t", weeklyAndEventResult.Name, weeklyAndEventResult.IsActive))
+			log.Infof("Schedule Checks: weekly & event schedule: %s is-active: %t", weeklyAndEventResult.Name, weeklyAndEventResult.IsActive)
 		}
-		log.Info(fmt.Sprintf("Schedule Checks: weeklyAndEventResult: %+v", weeklyAndEventResult))
+		log.Infof("Schedule Checks: weeklyAndEventResult: %+v", weeklyAndEventResult)
 
 		// CHECK EXCEPTION SCHEDULES
 		exceptionResult, err := utils.ExceptionCheck(scheduleJSON.Schedules.Exceptions, scheduleNameToCheck, timezone) // This will check for any active schedules with defined name.
 		if err != nil {
-			log.Error(fmt.Sprintf("Schedule Checks: issue on exceptionResult %s", err.Error()))
+			log.Errorf("Schedule Checks: issue on exceptionResult %s", err.Error())
 		} else {
-			log.Info(fmt.Sprintf("Schedule Checks: exception schedule: %s  is-active: %t", exceptionResult.Name, exceptionResult.IsActive))
+			log.Infof("Schedule Checks: exception schedule: %s  is-active: %t", exceptionResult.Name, exceptionResult.IsActive)
 		}
 		if exceptionResult.CheckIfEmpty() {
-			log.Info(fmt.Sprintf("Schedule Checks: exception schedule is empty: %s", exceptionResult.Name))
+			log.Infof("Schedule Checks: exception schedule is empty: %s", exceptionResult.Name)
 		}
-		log.Info(fmt.Sprintf("Schedule Checks: exceptionResult: %+v", exceptionResult))
+		log.Infof("Schedule Checks: exceptionResult: %+v", exceptionResult)
 
 		finalResult, err := utils.ApplyExceptionSchedule(weeklyAndEventResult, exceptionResult, timezone) // This applies the exception schedule to mask the combined weekly and event schedules.
 		if err != nil {
 			log.Error(fmt.Sprintf("Schedule Checks: final-result: %s", err.Error()))
 		}
-		log.Info(fmt.Sprintf("Schedule Checks: final-result: %s  is-active: %t timezone: %s", finalResult.Name, finalResult.IsActive, timezone))
-		log.Info(fmt.Sprintf("Schedule Checks: finalResult: %+v", finalResult))
+		log.Infof("Schedule Checks: final-result: %s  is-active: %t timezone: %s", finalResult.Name, finalResult.IsActive, timezone)
+		log.Infof("Schedule Checks: finalResult: %+v", finalResult)
 
 		if sch != nil {
 			m.store.Set(sch.Name, finalResult, -1)
@@ -133,7 +133,7 @@ func (m *Module) runSchedule() {
 
 			_, err = m.grpcMarshaller.UpdateScheduleAllProps(sch.UUID, sch)
 			if err != nil {
-				log.Error(fmt.Sprintf("Schedule Checks: issue on UpdateSchedule %s, error: %v", sch.UUID, err))
+				log.Errorf("Schedule Checks: issue on UpdateSchedule %s, error: %v", sch.UUID, err)
 			}
 		}
 	}
