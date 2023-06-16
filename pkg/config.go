@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/NubeIO/module-core-system/logger"
 	"github.com/go-yaml/yaml"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -43,6 +44,7 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 		return nil, err
 	}
 	m.Config = newConfig
+	logger.SetLogger(m.Config.LogLevel)
 	log.Info("config is set")
 	return newConfValid, nil
 }
