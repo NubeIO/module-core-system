@@ -2,6 +2,8 @@ module github.com/NubeIO/module-core-system
 
 go 1.20
 
+replace github.com/NubeIO/rubix-os => /Users/i8e4/CodeDuo/NubeIO/rubix-os
+
 require (
 	github.com/NubeIO/lib-schema v0.2.15
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
@@ -39,5 +41,3 @@ require (
 	gorm.io/driver/mysql v1.3.2 // indirect
 	gorm.io/gorm v1.23.2 // indirect
 )
-
-replace github.com/NubeIO/rubix-os => /Users/i8e4/CodeDuo/NubeIO/rubix-os
