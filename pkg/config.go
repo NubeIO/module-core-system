@@ -29,7 +29,7 @@ func (m *Module) DefaultConfig() interface{} {
 }
 
 func (m *Module) GetConfig() interface{} {
-	return m.Config
+	return m.config
 }
 
 func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
@@ -40,8 +40,8 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	if newConfig.LogLevel == "" {
 		newConfig.LogLevel = "ERROR"
 	}
-	m.Config = newConfig
-	logLevel, err := log.ParseLevel(strings.ToLower(m.Config.LogLevel))
+	m.config = newConfig
+	logLevel, err := log.ParseLevel(strings.ToLower(m.config.LogLevel))
 	if err != nil {
 		return nil, err
 	}

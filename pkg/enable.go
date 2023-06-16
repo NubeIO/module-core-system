@@ -27,8 +27,8 @@ func (m *Module) Enable() error {
 
 	cron = gocron.NewScheduler(time.UTC)
 	var frequency = time.Duration(60) * time.Second
-	if m.Config.Schedule.Frequency == 0 {
-		frequency = m.Config.Schedule.Frequency * time.Second
+	if m.config.Schedule.Frequency == 0 {
+		frequency = m.config.Schedule.Frequency * time.Second
 	}
 	_, _ = cron.Every(frequency).Tag("ScheduleCheck").Do(m.runSchedule)
 	cron.StartAsync()

@@ -10,7 +10,7 @@ type Module struct {
 	dbHelper       shared.DBHelper
 	moduleName     string
 	grpcMarshaller shared.Marshaller
-	Config         *Config
+	config         *Config
 	pluginUUID     string
 	networkUUID    string
 	interruptChan  chan struct{}
