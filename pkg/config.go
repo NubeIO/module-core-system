@@ -40,6 +40,10 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	if newConfig.LogLevel == "" {
 		newConfig.LogLevel = "ERROR"
 	}
+	newConfValid, err := yaml.Marshal(newConfig)
+	if err != nil {
+		return nil, err
+	}
 	m.config = newConfig
 	logLevel, err := log.ParseLevel(strings.ToLower(m.config.LogLevel))
 	if err != nil {
@@ -47,9 +51,5 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	}
 	logger.SetLogger(logLevel)
 	log.Info("config is set")
-	newConfValid, err := yaml.Marshal(newConfig)
-	if err != nil {
-		return nil, err
-	}
 	return newConfValid, nil
 }
