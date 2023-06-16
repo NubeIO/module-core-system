@@ -6,7 +6,7 @@ import (
 
 func SetLogger(logLevel log.Level) {
 	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: true,
+		DisableTimestamp: true,
 	})
 	log.SetLevel(logLevel)
 }
