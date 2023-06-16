@@ -4,12 +4,13 @@ import (
 	"github.com/NubeIO/module-core-system/logger"
 	"github.com/go-yaml/yaml"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
 type Config struct {
-	Schedule Schedule  `yaml:"schedule"`
-	LogLevel log.Level `yaml:"log_level"`
+	Schedule Schedule `yaml:"schedule"`
+	LogLevel string   `yaml:"log_level"`
 }
 
 type Schedule struct {
@@ -23,7 +24,7 @@ func (m *Module) DefaultConfig() interface{} {
 
 	return &Config{
 		Schedule: schedule,
-		LogLevel: log.ErrorLevel,
+		LogLevel: "ERROR",
 	}
 }
 
@@ -36,15 +37,19 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	if err := yaml.Unmarshal(config, newConfig); err != nil {
 		return nil, err
 	}
-	if newConfig.LogLevel == log.Level(0) {
-		newConfig.LogLevel = log.ErrorLevel
+	if newConfig.LogLevel == "" {
+		newConfig.LogLevel = "ERROR"
 	}
+	m.Config = newConfig
+	logLevel, err := log.ParseLevel(strings.ToLower(m.Config.LogLevel))
+	if err != nil {
+		return nil, err
+	}
+	logger.SetLogger(logLevel)
+	log.Info("config is set")
 	newConfValid, err := yaml.Marshal(newConfig)
 	if err != nil {
 		return nil, err
 	}
-	m.Config = newConfig
-	logger.SetLogger(m.Config.LogLevel)
-	log.Info("config is set")
 	return newConfValid, nil
 }
