@@ -17,6 +17,6 @@ func ServePlugin(module *pkg.Module) {
 
 func main() {
 	module := &pkg.Module{}
-	logger.SetLogger(module.Config)
+	logger.SetLogger(module.Config.LogLevel)
 	ServePlugin(module)
 }
