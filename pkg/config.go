@@ -4,7 +4,6 @@ import (
 	"github.com/NubeIO/module-core-system/logger"
 	"github.com/go-yaml/yaml"
 	log "github.com/sirupsen/logrus"
-	"strings"
 	"time"
 )
 
@@ -15,6 +14,16 @@ type Config struct {
 
 type Schedule struct {
 	Frequency time.Duration `yaml:"frequency"`
+}
+
+var LogLevelMap = []string{
+	"fatal",
+	"error",
+	"panic",
+	"info",
+	"debug",
+	"warn",
+	"trace",
 }
 
 func (m *Module) DefaultConfig() interface{} {
@@ -37,19 +46,28 @@ func (m *Module) ValidateAndSetConfig(config []byte) ([]byte, error) {
 	if err := yaml.Unmarshal(config, newConfig); err != nil {
 		return nil, err
 	}
-	if newConfig.LogLevel == "" {
+
+	configHasMatchingLogLevel := false
+	for _, locLogLevel := range LogLevelMap {
+		if newConfig.LogLevel == locLogLevel {
+			configHasMatchingLogLevel = true
+			break
+		}
+	}
+	if !configHasMatchingLogLevel {
 		newConfig.LogLevel = "ERROR"
 	}
+	logLevel, err := log.ParseLevel(newConfig.LogLevel)
+	if err != nil {
+		return nil, err
+	}
+	logger.SetLogger(logLevel) // TODO: Check this
+
 	newConfValid, err := yaml.Marshal(newConfig)
 	if err != nil {
 		return nil, err
 	}
 	m.config = newConfig
-	logLevel, err := log.ParseLevel(strings.ToLower(m.config.LogLevel))
-	if err != nil {
-		return nil, err
-	}
-	logger.SetLogger(logLevel)
 	log.Info("config is set")
 	return newConfValid, nil
 }
