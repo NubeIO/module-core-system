@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/NubeIO/module-core-system/logger"
 	"github.com/NubeIO/module-core-system/pkg"
 	"github.com/NubeIO/rubix-os/module/shared"
 	"github.com/hashicorp/go-plugin"
@@ -16,6 +15,5 @@ func ServePlugin() {
 }
 
 func main() {
-	logger.SetLogger("INFO")
 	ServePlugin()
 }

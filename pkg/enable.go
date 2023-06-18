@@ -26,11 +26,7 @@ func (m *Module) Enable() error {
 	}
 
 	cron = gocron.NewScheduler(time.UTC)
-	var frequency = "60s"
-	if m.config.Schedule.Frequency != "" {
-		frequency = m.config.Schedule.Frequency
-	}
-	_, _ = cron.Every(frequency).Tag("ScheduleCheck").Do(m.runSchedule)
+	_, _ = cron.Every(m.config.Schedule.Frequency).Tag("ScheduleCheck").Do(m.runSchedule)
 	cron.StartAsync()
 
 	// Not sure if this is needed or not & which network to map to
