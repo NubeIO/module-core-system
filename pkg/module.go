@@ -11,9 +11,6 @@ type Module struct {
 	moduleName     string
 	grpcMarshaller shared.Marshaller
 	config         *Config
-	pluginUUID     string
-	networkUUID    string
-	interruptChan  chan struct{}
 	store          *cache.Cache
 }
 
