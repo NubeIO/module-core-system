@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/NubeIO/lib-schema/systemschema"
-	"github.com/NubeIO/rubix-os/module/common"
 )
 
 const (
@@ -15,14 +14,7 @@ const (
 
 func (m *Module) Get(path string) ([]byte, error) {
 	if path == jsonSchemaNetwork {
-		fns, err := m.grpcMarshaller.GetFlowNetworks("")
-		if err != nil {
-			return nil, err
-		}
-
-		networkSchema := systemschema.GetNetworkSchema()
-		networkSchema.AutoMappingFlowNetworkName.Options = common.GetFlowNetworkNames(fns)
-		return json.Marshal(networkSchema)
+		return json.Marshal(systemschema.GetNetworkSchema())
 	} else if path == jsonSchemaDevice {
 		return json.Marshal(systemschema.GetDeviceSchema())
 	} else if path == jsonSchemaPoint {
