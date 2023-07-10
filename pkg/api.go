@@ -3,7 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/NubeIO/lib-schema/systemschema"
+	"github.com/NubeIO/rubix-os/schema/systemschema"
 )
 
 const (
