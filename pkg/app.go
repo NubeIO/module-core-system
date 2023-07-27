@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-var name = "module-core-system"
-
 func (m *Module) networkUpdateSuccess(uuid string) error {
 	var network model.Network
 	network.InFault = false
@@ -19,7 +17,7 @@ func (m *Module) networkUpdateSuccess(uuid string) error {
 	network.LastOk = time.Now().UTC()
 	err := m.grpcMarshaller.UpdateNetworkErrors(uuid, &network)
 	if err != nil {
-		log.Error(bugs.DebugPrint(name, m.networkUpdateSuccess, err))
+		log.Error(bugs.DebugPrint(m.moduleName, m.networkUpdateSuccess, err))
 	}
 	return err
 }
@@ -33,7 +31,7 @@ func (m *Module) networkUpdateErr(uuid, port string, e error) error {
 	network.LastFail = time.Now().UTC()
 	err := m.grpcMarshaller.UpdateNetworkErrors(uuid, &network)
 	if err != nil {
-		log.Error(bugs.DebugPrint(name, m.networkUpdateErr, err))
+		log.Error(bugs.DebugPrint(m.moduleName, m.networkUpdateErr, err))
 	}
 	return err
 }
