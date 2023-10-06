@@ -7,7 +7,6 @@ import (
 	"github.com/NubeIO/rubix-os/utils/boolean"
 	log "github.com/sirupsen/logrus"
 	"strings"
-	"time"
 )
 
 func (m *Module) runSchedule() {
@@ -32,22 +31,10 @@ func (m *Module) runSchedule() {
 
 		scheduleNameToCheck := "ALL" // TODO: we may need a way to specify the schedule name that is being checked for.
 
-		var timezone = scheduleJSON.Config.TimeZone
+		timezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0]
 		if timezone == "" {
-			timezone = sch.TimeZone
-		}
-
-		_, err = time.LoadLocation(timezone)
-		if timezone == "" || err != nil {
-			log.Error("Schedule Checks: CheckWeeklyScheduleCollection: no timezone pass in from user")
-			systemTimezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0]
-			if systemTimezone == "" {
-				zone, _ := utilstime.GetHardwareTZ()
-				timezone = zone
-			} else {
-				timezone = systemTimezone
-			}
-			sch.TimeZone = timezone
+			zone, _ := utilstime.GetHardwareTZ()
+			timezone = zone
 		}
 
 		// CHECK WEEKLY SCHEDULES
