@@ -3,7 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/NubeIO/rubix-os/schema/systemschema"
+	"github.com/NubeIO/module-core-system/schema"
 )
 
 const (
@@ -14,11 +14,11 @@ const (
 
 func (m *Module) Get(path string) ([]byte, error) {
 	if path == jsonSchemaNetwork {
-		return json.Marshal(systemschema.GetNetworkSchema())
+		return json.Marshal(schema.GetNetworkSchema())
 	} else if path == jsonSchemaDevice {
-		return json.Marshal(systemschema.GetDeviceSchema())
+		return json.Marshal(schema.GetDeviceSchema())
 	} else if path == jsonSchemaPoint {
-		return json.Marshal(systemschema.GetPointSchema())
+		return json.Marshal(schema.GetPointSchema())
 	}
 
 	return nil, errors.New("not found")

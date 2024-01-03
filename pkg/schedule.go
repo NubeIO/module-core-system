@@ -2,9 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-utils-go/boolean"
 	"github.com/NubeIO/module-core-system/utils"
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/times/utilstime"
-	"github.com/NubeIO/rubix-os/utils/boolean"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )

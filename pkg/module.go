@@ -1,21 +1,21 @@
 package pkg
 
 import (
-	"github.com/NubeIO/rubix-os/module/shared"
+	"github.com/NubeIO/lib-module-go/nmodule"
 	"github.com/patrickmn/go-cache"
 	"time"
 )
 
 type Module struct {
-	dbHelper       shared.DBHelper
+	dbHelper       nmodule.DBHelper
 	moduleName     string
-	grpcMarshaller shared.Marshaller
+	grpcMarshaller nmodule.Marshaller
 	config         *Config
 	store          *cache.Cache
 }
 
-func (m *Module) Init(dbHelper shared.DBHelper, moduleName string) error {
-	grpcMarshaller := shared.GRPCMarshaller{DbHelper: dbHelper}
+func (m *Module) Init(dbHelper nmodule.DBHelper, moduleName string) error {
+	grpcMarshaller := nmodule.GRPCMarshaller{DbHelper: dbHelper}
 	m.dbHelper = dbHelper
 	m.moduleName = moduleName
 	m.grpcMarshaller = &grpcMarshaller
@@ -23,8 +23,8 @@ func (m *Module) Init(dbHelper shared.DBHelper, moduleName string) error {
 	return nil
 }
 
-func (m *Module) GetInfo() (*shared.Info, error) {
-	return &shared.Info{
+func (m *Module) GetInfo() (*nmodule.Info, error) {
+	return &nmodule.Info{
 		Name:       m.moduleName,
 		Author:     "Nube iO",
 		Website:    "https://nube-io.com",

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/NubeIO/rubix-os/utils/boolean"
+	"github.com/NubeIO/lib-utils-go/boolean"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
