@@ -2,9 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-utils-go/boolean"
 	"github.com/NubeIO/module-core-system/utils"
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/times/utilstime"
-	"github.com/NubeIO/rubix-os/utils/boolean"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -19,16 +19,15 @@ func (m *Module) runSchedule() {
 	}
 
 	for _, sch := range schedules {
+		if !boolean.IsTrue(sch.Enable) {
+			log.Debugf("Schedule Checks: runSchedule() sch is not enabled so skip logic. name: %s", sch.Name)
+			continue
+		}
 		scheduleJSON, err := utils.DecodeSchedule(sch.Schedule)
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on DecodeSchedule %v\n", err)
 			return
 		}
-		if !boolean.IsTrue(sch.Enable) {
-			log.Debugf("Schedule Checks: runSchedule sch is not enabled so skip logic. name: %s", sch.Name)
-			return
-		}
-
 		scheduleNameToCheck := "ALL" // TODO: we may need a way to specify the schedule name that is being checked for.
 
 		timezone := strings.Split((*utilstime.SystemTime()).HardwareClock.Timezone, " ")[0]
@@ -54,7 +53,7 @@ func (m *Module) runSchedule() {
 		}
 		log.Debugf("Schedule Checks: eventResult: %+v", eventResult)
 
-		// 	COMBINE EVENT AND WEEKLY SCHEDULE RESULTS
+		// COMBINE EVENT AND WEEKLY SCHEDULE RESULTS
 		weeklyAndEventResult, err := utils.CombineScheduleCheckerResults(weeklyResult, eventResult, timezone)
 		if err != nil {
 			log.Errorf("Schedule Checks: issue on weeklyAndEventResult %s", err.Error())
