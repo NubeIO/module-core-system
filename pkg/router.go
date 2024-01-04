@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/NubeIO/lib-module-go/nhttp"
 	"github.com/NubeIO/lib-module-go/nmodule"
 	"github.com/NubeIO/lib-module-go/router"
@@ -22,6 +23,8 @@ func InitRouter() {
 	route.Handle(nhttp.GET, "/api/networks/schema", GetNetworkSchema)
 	route.Handle(nhttp.GET, "/api/devices/schema", GetDeviceSchema)
 	route.Handle(nhttp.GET, "/api/points/schema", GetPointSchema)
+
+	route.Handle(nhttp.GET, "/api/system/schedule/store/name/:name", GetSystemScheduleStore)
 }
 
 func GetNetworkSchema(m *nmodule.Module, r *router.Request) ([]byte, error) {
@@ -34,4 +37,12 @@ func GetDeviceSchema(m *nmodule.Module, r *router.Request) ([]byte, error) {
 
 func GetPointSchema(m *nmodule.Module, r *router.Request) ([]byte, error) {
 	return json.Marshal(schema.GetPointSchema())
+}
+
+func GetSystemScheduleStore(m *nmodule.Module, r *router.Request) ([]byte, error) {
+	obj, ok := (*m).(*Module).store.Get(r.PathParams["name"])
+	if !ok {
+		return nil, errors.New("no schedule exists")
+	}
+	return json.Marshal(obj)
 }
